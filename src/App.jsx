@@ -1,3 +1,7 @@
+// Faaiz Abdullah 301472058
+// IAT 459 Assignment 2 - React Recipe Manager
+
+
 import { useState } from 'react';
 import Nav from './Nav';
 import RecipeList from './RecipeList';
