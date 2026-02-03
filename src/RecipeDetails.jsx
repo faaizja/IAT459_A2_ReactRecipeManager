@@ -1,76 +1,81 @@
 function RecipeDetails({ recipe, onBack }) {
   if (!recipe) {
     return (
-      <div className="text-center mt-10">
-        <p className="text-red-500 text-xl">Error: Recipe not found.</p>
-        <button 
-          onClick={onBack} 
-          className="mt-4 text-blue-600 underline"
-        >
-          Back to list
+      <div className="text-center mt-20">
+        <h2 className="text-2xl font-bold text-red-400">Recipe Missing</h2>
+        <button onClick={onBack} className="mt-4 text-stone-500 underline hover:text-stone-800">
+          Go Home
         </button>
       </div>
     );
   }
 
-  // Filter out ingredients that have no item name to keep the display clean
   const validIngredients = recipe.ingredients.filter(ing => ing.item.trim() !== '');
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    <div className="max-w-4xl mx-auto">
       <button 
         onClick={onBack}
-        className="mb-6 text-gray-500 hover:text-blue-600 flex items-center"
+        className="mb-6 flex items-center text-stone-500 hover:text-amber-700 font-medium transition-colors group"
       >
-        ← Back to List
+        <span className="bg-white border border-stone-200 rounded-full w-8 h-8 flex items-center justify-center mr-2 group-hover:border-amber-400">←</span>
+        Back to Cookbook
       </button>
 
-      <div className="border-b pb-4 mb-6">
-        <h2 className="text-4xl font-bold text-gray-900 mb-2">{recipe.name}</h2>
-        <div className="flex flex-wrap gap-4 text-sm text-gray-600 mt-2">
-            <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
-                <strong>Prep:</strong> {recipe.prepTime}
-            </span>
-            <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
-                <strong>Cook:</strong> {recipe.cookTime}
-            </span>
-            <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
-                <strong>Serves:</strong> {recipe.serves}
-            </span>
+      <div className="bg-white rounded-xl shadow-lg border border-stone-200 overflow-hidden">
+        {/* Header */}
+        <div className="bg-amber-50 p-8 border-b border-amber-100">
+          <h2 className="text-4xl md:text-5xl font-serif font-bold text-stone-800 mb-4">
+            {recipe.name}
+          </h2>
+          
+          <div className="flex flex-wrap gap-3">
             {recipe.tags && (
-                <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
-                    🏷️ {recipe.tags}
-                </span>
+              <span className="inline-block bg-white text-stone-600 px-4 py-1.5 rounded-full text-sm font-bold border border-stone-200 shadow-sm">
+                🏷️ {recipe.tags}
+              </span>
             )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2">Ingredients</h3>
-            <table className="w-full text-sm">
-                <tbody>
-                    {validIngredients.length > 0 ? (
-                        validIngredients.map((ing, i) => (
-                            <tr key={i} className="border-b last:border-0">
-                                <td className="py-2 font-semibold text-gray-700 w-16">
-                                    {ing.qty} {ing.unit}
-                                </td>
-                                <td className="py-2 text-gray-600">{ing.item}</td>
-                            </tr>
-                        ))
-                    ) : (
-                        <tr><td className="py-2 text-gray-500 italic">No ingredients listed.</td></tr>
-                    )}
-                </tbody>
-            </table>
-        </div>
-
-        <div className="md:col-span-2">
-            <h3 className="text-xl font-bold mb-4 border-b pb-2">Instructions</h3>
-            <div className="prose max-w-none text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {recipe.instructions}
+            <div className="flex items-center space-x-4 bg-white px-4 py-1.5 rounded-full border border-stone-200 text-sm font-medium text-stone-600 shadow-sm">
+              <span>⏱️ Prep: {recipe.prepTime}</span>
+              <span className="w-px h-4 bg-stone-300"></span>
+              <span>🔥 Cook: {recipe.cookTime}</span>
+              <span className="w-px h-4 bg-stone-300"></span>
+              <span>👥 Serves: {recipe.serves}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-stone-100">
+          
+          {/* Ingredients Column */}
+          <div className="p-8 bg-white md:col-span-1">
+            <h3 className="text-xl font-serif font-bold text-amber-700 mb-6 flex items-center">
+              <span className="mr-2">🥕</span> Ingredients
+            </h3>
+            <ul className="space-y-3 text-stone-700 text-sm">
+              {validIngredients.length > 0 ? (
+                validIngredients.map((ing, i) => (
+                  <li key={i} className="flex justify-between items-center border-b border-stone-50 pb-2 last:border-0">
+                    <span className="font-bold text-stone-800">{ing.qty} {ing.unit}</span>
+                    <span className="text-stone-600 text-right pl-2">{ing.item}</span>
+                  </li>
+                ))
+              ) : (
+                <li className="text-stone-400 italic">No ingredients listed.</li>
+              )}
+            </ul>
+          </div>
+
+          {/* Instructions Column */}
+          <div className="p-8 md:col-span-2 bg-white">
+            <h3 className="text-xl font-serif font-bold text-amber-700 mb-6 flex items-center">
+              <span className="mr-2">📝</span> Method
+            </h3>
+            <div className="prose prose-stone max-w-none text-stone-700 leading-8 whitespace-pre-wrap">
+              {recipe.instructions}
+            </div>
+          </div>
         </div>
       </div>
     </div>

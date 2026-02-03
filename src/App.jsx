@@ -7,7 +7,7 @@ import './App.css';
 
 function App() {
   const [recipes, setRecipes] = useState([]);
-  const [currentView, setCurrentView] = useState('home'); // 'home', 'add', 'details'
+  const [currentView, setCurrentView] = useState('home'); 
   const [selectedRecipeId, setSelectedRecipeId] = useState(null);
 
   const handleAddRecipe = (newRecipe) => {
@@ -26,10 +26,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans">
-      <Nav setCurrentView={setCurrentView} />
+    <div className="min-h-screen bg-stone-100 text-stone-800 font-sans selection:bg-amber-200">
+      <Nav setCurrentView={setCurrentView} currentView={currentView} />
       
-      <main className="container mx-auto p-4">
+      <main className="container mx-auto p-4 md:p-8 max-w-5xl">
         {currentView === 'home' && (
           <RecipeList 
             recipes={recipes} 
