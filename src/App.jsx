@@ -6,50 +6,60 @@ import RecipeDetails from './RecipeDetails';
 import './App.css';
 
 function App() {
-  const [recipes, setRecipes] = useState([]);
-  const [currentView, setCurrentView] = useState('home'); 
-  const [selectedRecipeId, setSelectedRecipeId] = useState(null);
+  const [recipes, setRecipes] = useState([]); // array of recipes 
+  const [currentView, setCurrentView] = useState('home'); // decides which view to show user
+  const [selectedRecipeId, setSelectedRecipeId] = useState(null); // the selected recipe at the moment
 
-  const handleAddRecipe = (newRecipe) => {
-    const recipeWithId = { ...newRecipe, id: Date.now() };
-    setRecipes([...recipes, recipeWithId]);
+  const addRecipeHandler = (newRecipe) => {
+    const recipeWithId = { 
+      ...newRecipe, 
+      id: Date.now() 
+    };
+    
+    const updatedRecipes = [...recipes, recipeWithId];
+    setRecipes(updatedRecipes);
+    
     setCurrentView('home');
   };
 
-  const handleViewDetails = (id) => {
+  const viewDetailsHandler = (id) => {
     setSelectedRecipeId(id);
     setCurrentView('details');
   };
 
-  const getSelectedRecipe = () => {
-    return recipes.find((recipe) => recipe.id === selectedRecipeId);
+  const getActiveRecipe = () => {
+    return recipes.find((r) => r.id === selectedRecipeId);
   };
 
   return (
-    <div className="min-h-screen bg-stone-100 text-stone-800 font-sans selection:bg-amber-200">
-      <Nav setCurrentView={setCurrentView} currentView={currentView} />
+    <div className="min-h-screen bg-stone-100 text-stone-800 font-sans">
+      <Nav currentView={currentView} setCurrentView={setCurrentView} />
       
       <main className="container mx-auto p-4 md:p-8 max-w-5xl">
+
+      {/* below the view state depends on the value of current view */}
+
         {currentView === 'home' && (
           <RecipeList 
             recipes={recipes} 
-            onViewDetails={handleViewDetails} 
+            onViewDetails={viewDetailsHandler} 
           />
         )}
 
         {currentView === 'add' && (
           <AddRecipe 
-            onAdd={handleAddRecipe} 
+            onSave={addRecipeHandler} 
             onCancel={() => setCurrentView('home')}
           />
         )}
 
         {currentView === 'details' && (
           <RecipeDetails 
-            recipe={getSelectedRecipe()} 
+            recipe={getActiveRecipe()} 
             onBack={() => setCurrentView('home')} 
           />
         )}
+
       </main>
     </div>
   );

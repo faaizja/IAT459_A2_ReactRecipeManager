@@ -1,8 +1,9 @@
 import { useState } from 'react';
 
-function AddRecipe({ onAdd, onCancel }) {
+function AddRecipe({ onSave, onCancel }) {
   const [error, setError] = useState('');
   
+  // fields to be populated
   const [formData, setFormData] = useState({
     name: '',
     prepTime: '',
@@ -12,56 +13,76 @@ function AddRecipe({ onAdd, onCancel }) {
     tags: ''
   });
 
-  const [ingredients, setIngredients] = useState(
-    Array.from({ length: 10 }).map(() => ({ qty: '', unit: 'cup', item: '' }))
-  );
+  // creating 10 empty rows and pushing in an array
+  const getEmptyRows = () => {
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+      rows.push({ qty: '', unit: 'cup', item: '' });
+    }
+    return rows;
+  };
 
+  const [ingredients, setIngredients] = useState(getEmptyRows());
+
+  // adding ingredients logic
   const handleIngredientChange = (index, field, value) => {
-    const newIngredients = [...ingredients];
-    newIngredients[index][field] = value;
-    setIngredients(newIngredients);
+    const updatedIngredients = [...ingredients];
+    updatedIngredients[index][field] = value;
+    setIngredients(updatedIngredients);
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
-  const validateAndSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
+    // Check quantities
     for (let i = 0; i < ingredients.length; i++) {
       const row = ingredients[i];
-      if (row.qty && isNaN(Number(row.qty))) {
-        setError(`⚠️ Oops! Row ${i + 1} has an invalid quantity number.`);
+      // if the quantity is not a number
+      if (row.qty !== '' && isNaN(Number(row.qty))) {
+        setError('Error: Quantity in row ' + (i + 1) + ' must be a number.');
         window.scrollTo(0, 0);
         return;
       }
     }
 
-    const newRecipe = { ...formData, ingredients: ingredients };
-    onAdd(newRecipe);
+    // combine into an object if the submission is accepted
+    const newRecipe = { 
+      ...formData, 
+      ingredients: ingredients 
+    };
+
+    onSave(newRecipe);
   };
 
+  // predetermined styles 
   const inputClass = "w-full border-2 border-stone-200 rounded-lg p-2.5 bg-stone-50 focus:bg-white focus:border-amber-400 focus:outline-none transition-all";
   const labelClass = "block text-sm font-bold text-stone-700 mb-1 tracking-wide";
 
+
+  // displaying everything
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-lg border border-stone-100">
       <div className="flex justify-between items-center mb-8 border-b border-stone-100 pb-4">
-        <h2 className="text-3xl font-serif font-bold text-stone-800">Write a New Recipe</h2>
+        <h2 className="text-3xl font-serif font-bold text-stone-800">Add New Recipe</h2>
         <button onClick={onCancel} className="text-stone-400 hover:text-red-500 text-2xl font-bold">&times;</button>
       </div>
       
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 flex items-center">
-          <span className="mr-2">🚨</span> {error}
+          {error}
         </div>
       )}
 
-      <form onSubmit={validateAndSubmit} className="space-y-8">
-        {/* Top Section */}
+      <form onSubmit={handleSubmit} className="space-y-8">
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
             <label className={labelClass}>Recipe Name</label>
@@ -76,12 +97,12 @@ function AddRecipe({ onAdd, onCancel }) {
           </div>
           
           <div>
-            <label className={labelClass}>Tags / Category</label>
+            <label className={labelClass}>Tags</label>
             <input 
               name="tags"
               value={formData.tags}
               onChange={handleChange}
-              placeholder="e.g. Dessert, Gluten-Free"
+              placeholder="e.g. Dessert"
               className={inputClass}
             />
           </div>
@@ -110,9 +131,8 @@ function AddRecipe({ onAdd, onCancel }) {
           </div>
         </div>
 
-        {/* Serves */}
         <div className="bg-stone-50 p-4 rounded-xl border border-stone-100">
-          <label className={labelClass}>Servings</label>
+          <label className={labelClass}>Serves</label>
           <div className="flex flex-wrap gap-4 mt-2">
             {['1', '2', '4', '6', '8+'].map((opt) => (
               <label key={opt} className="cursor-pointer relative">
@@ -132,15 +152,14 @@ function AddRecipe({ onAdd, onCancel }) {
           </div>
         </div>
 
-        {/* Ingredients */}
         <div>
-          <label className="text-xl font-serif font-bold text-stone-800 mb-4 block">Ingredients List</label>
+          <label className="text-xl font-serif font-bold text-stone-800 mb-4 block">Ingredients</label>
           <div className="border border-stone-200 rounded-lg overflow-hidden shadow-sm">
             <table className="w-full">
               <thead className="bg-stone-100 text-stone-600 text-xs uppercase tracking-wider">
                 <tr>
-                  <th className="p-3 text-left w-24">Qty</th>
-                  <th className="p-3 text-left w-32">Unit</th>
+                  <th className="p-3 text-left w-24">Quantity</th>
+                  <th className="p-3 text-left w-32">Measurement</th>
                   <th className="p-3 text-left">Item</th>
                 </tr>
               </thead>
@@ -152,7 +171,7 @@ function AddRecipe({ onAdd, onCancel }) {
                         value={row.qty}
                         onChange={(e) => handleIngredientChange(i, 'qty', e.target.value)}
                         className="w-full p-2 rounded bg-transparent border border-transparent focus:border-amber-300 focus:bg-white outline-none text-center font-mono"
-                        placeholder="-"
+                        placeholder="0"
                       />
                     </td>
                     <td className="p-2">
@@ -185,7 +204,6 @@ function AddRecipe({ onAdd, onCancel }) {
           </div>
         </div>
 
-        {/* Instructions */}
         <div>
           <label className="text-xl font-serif font-bold text-stone-800 mb-2 block">Instructions</label>
           <textarea 
@@ -194,12 +212,10 @@ function AddRecipe({ onAdd, onCancel }) {
             value={formData.instructions}
             onChange={handleChange}
             rows="6"
-            placeholder="Step 1: Mix the dry ingredients..."
             className="w-full border-2 border-stone-200 rounded-lg p-4 bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-50 outline-none transition-all leading-relaxed"
           ></textarea>
         </div>
 
-        {/* Actions */}
         <div className="flex justify-end items-center gap-4 pt-4 border-t border-stone-100">
           <button 
             type="button" 
@@ -212,7 +228,7 @@ function AddRecipe({ onAdd, onCancel }) {
             type="submit"
             className="px-8 py-3 bg-amber-600 text-white rounded-lg shadow-md hover:bg-amber-700 hover:shadow-lg transition-all font-bold tracking-wide transform active:scale-95"
           >
-            Save to Cookbook
+            Save Recipe
           </button>
         </div>
       </form>
